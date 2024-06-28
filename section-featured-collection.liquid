@@ -1,0 +1,97 @@
+{{ 'component-scroll.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'section-featured-collection.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'card-revealer.js' | asset_url }}" defer="defer"></script>
+
+<div class="relative container bg-white mx-auto px-6 py-9 md:max-w-none md:pt-20 md:pb-[100px] md:pl-32 md:pr-0 min-[1664px]:pr-0">
+    <!-- No h tag here due to ADA compliance especially for a dynamic section-->
+    <div class="font-serif font-bold text-center text-raisin-black text-[28px]/[35.28px] tracking-[-0.01em] mb-6 md:text-left md:text-[40px]/[48px] md:mb-9 md:max-w-[1664px] md:flex md:items-center md:font-black">
+        {{ section.settings.title }}
+        <a href="{{ section.settings.cta_link }}" class="font-sans font-semibold text-olive-drab text-sm/[19.6px] tracking-[0.03em] ml-auto mr-8 text-right hidden items-center md:flex">{{ section.settings.cta_text }} {% render 'icon' | class: 'link-arrow' %}</a>
+    </div>
+    <ul class="styled-scrollbar flex flex-wrap mb-3 md:flex-nowrap md:overflow-x-scroll md:mb-0">
+        {% assign products_looped = 0 %}
+        {% for product in section.settings.featured_collection | limit: 10 %}
+            {% products_looped = forloop.index %}
+            <li class="w-1/2 mb-3 md:w-[355px] md:grow-0 md:shrink-0 md:mb-12{% cycle ' odd:pr-[5.5px] md:odd:pr-0 md:mr-6', ' even:pl-[5.5px] md:even:pl-0 md:mr-6' %}">
+                <a href="{{ product.url }}">
+                    <div class="relative group">
+                        {{ product.featured_image | image_url: width: 355 | image_tag: widths: '158, 355' }}
+                        {% if product.media[1].media_type == 'image' %}
+                            {{ product.media[1] | image_url: width: 355 | image_tag: widths: '158, 355' }}
+                        {% endif %}
+                        <div class="absolute left-1 top-1 bg-white border border-black rounded-full font-display font-normal text-black text-center text-[8px]/[9.6px] tracking-[0.04em] px-2 py-1 min-w-[49px] md:left-2 md:top-2 md:text-[10px]/[12px] md:tracking-[0.06em]">{{ section.settings.featured_collection.title }}</div>
+                        {% if product.metafields.badge %}
+                            <div class="absolute right-1 top-1 bg-eucalyptus-green border border-black rounded-full font-display font-normal text-white text-center text-[8px]/[9.6px] tracking-[0.04em] px-2 py-1 min-w-[49px] md:right-[27px] md:top-2 md:text-[10px]/[12px] md:tracking-[0.06em]">{{ product.metafields.badge }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="flex flex-col text-left px-2 pb-2 mt-3 md:mt-4 md:pb-4">
+                        <span class="font-display font-normal text-base/[19.2px] tracking-[0.03em] mb-2 md:text-lg/[21.6px]">{{ product.title }}</span>
+                        {% comment %} Replace the placeholder star rating with third party review widget {% endcomment %}
+                        <span class="text-eerie-black mb-2 flex items-center">
+                            {% render 'icon' | class: 'star' %}
+                            {% render 'icon' | class: 'star' %}
+                            {% render 'icon' | class: 'star' %}
+                            {% render 'icon' | class: 'star' %}
+                            {% render 'icon' | class: 'star' %}
+                            <span class="font-sans font-normal text-nickle ml-1 text-[11px]/[16.5px] md:text-sm/[18px]">1,234 Reviews</span>
+                        </span>
+                        <span class="font-sans font-medium text-eerie-black text-base">{{ product.price }}</span>
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    <div data-hide-scroll-overflow class="absolute w-[128px] h-[6px] bg-white bottom-[100px] right-0 hidden md:block"></div>
+    {% if products_looped > 4 %}
+        <button class="bg-eerie-black font-sans font-semibold text-white text-center text-base/[22.4px] tracking-[0.03em] w-full px-6 py-4 min-h-[54px] rounded-full md:hidden" data-reveal-button>{{ section.settings.show_more_text }}</button>
+    {% endif %}
+</div>
+
+{% schema %}
+    {
+        "name": "Featured Collection",
+        "tag": "section",
+        "class": "section",
+        "disabled_on": {
+            "groups": ["header", "footer"]
+        },
+        "settings": [
+            {
+                "type": "collection",
+                "id": "featured_collection",
+                "label": "Choose featured collection",
+                "info": "Use a collection with 6 or more products for best results"
+            },
+            {
+                "type": "text",
+                "id": "title",
+                "default": "Collection Title",
+                "label": "Title"
+            },
+            {
+                "type": "text",
+                "id": "cta_text",
+                "default": "Shop All Collection",
+                "label": "CTA Text (Desktop only)"
+            },
+            {
+                "type": "link",
+                "id": "cta_link",
+                "label": "CTA Link (Desktop only)"
+            },
+            {
+                "type": "text",
+                "id": "show_more_text",
+                "default": "Show More",
+                "label": "Show More Button Text (Mobile only)"
+            },
+        ],
+        "presets": [
+            {
+                "name": "Featured Collection"
+            }
+        ]
+    }
+{% endschema %}
